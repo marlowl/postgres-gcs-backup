@@ -1,24 +1,16 @@
-# postgres-gcs-backup
-
-## How to use
-
- 1. Unlock `script.sh`
- ```bash
-chmod +x script.sh
-```
- 2. Build the Dockerfile 
- ```bash
-docker build . -t postgres-gcs-backup
- ```
-
-3. Upload the Dockerfile to a registry of your choice
-
-4. Adjust `cronjob.yaml` 
-
-```yaml
-  ...
-  - name: postgres-backup
-            image: YOUR_DOCKER_IMAGE #here
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: postgres-backup
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: postgres-backup
+            image: YOUR_DOCKER_IMAGE
             env:
             - name: POSTGRES_USER
               value: your_postgres_user
@@ -34,8 +26,8 @@ docker build . -t postgres-gcs-backup
             - name: POSTGRES_PORT
               value: "5432"
             - name: BACKUP_GCS_BUCKET
-              value: YOUR_GCS_BUCKET #here
-            - name: GOOGLE_CLOUD_KEY 
+              value: YOUR_GCS_BUCKET
+            - name: GOOGLE_CLOUD_KEY
               valueFrom:
                 secretKeyRef:
                   name: postgres-sa
@@ -50,7 +42,3 @@ docker build . -t postgres-gcs-backup
           restartPolicy: OnFailure
           imagePullSecrets:
             - name: pull-secret
-
-```
-5. Apply `cronjob.yaml` to make frequent backups
- 
