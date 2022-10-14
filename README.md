@@ -1,5 +1,3 @@
-# postgres-gcs-backup
-
 ## How to use
 
  1. Unlock `script.sh`
